@@ -30,18 +30,49 @@ router.get('/who_needs_sql_injection', async (req: Request, res: Response) => {
     }
 });
 
-router.get('/foo', (req: Request, res: Response) => {
-    res.json(createSuccessResponse(ChangeName('foo', path)));
+router.get('/users', async (req: Request, res: Response) => {
+    try {
+        const queryResult = await executeQuery('SELECT * FROM accounts;');
+        res.json(queryResult);
+    } catch (error) {
+        res.status(500).json(createErrorResponse('Internal Server Error'));
+    }
 });
 
-router.get('/bar', (req: Request, res: Response) => {
-    res.json(createSuccessResponse(ChangeName('bar', path)));
+router.get('/users/:id', async (req: Request, res: Response) => {
+    const userId: string = req.params.id;
+
+    try {
+        const queryResult = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
+        if (queryResult.length === 0) {
+            res.status(404).json({ error: 'Account not found' });
+        } else {
+            res.json(queryResult[0]);
+        }
+    } catch (error) {
+        res.status(500).json(createErrorResponse('Internal Server Error'));
+    }
 });
 
-router.get('/change', (req: Request, res: Response) => {
-    const { name } = readFile(path);
-    res.json(createSuccessResponse(ChangeName(name === 'foo' ? 'bar' : 'foo', path)));
-});
+router.post('/users', async (req: Request, res: Response) => {
+    const { name, email } = req.body;
 
+    if (!name || !email) {
+        res.status(400).json({ error: 'Name and email are required' });
+        return;
+    }
+
+    try {
+        // Insert the new user into the database and retrieve the inserted ID.
+        const result = await executeQuery(`INSERT INTO accounts (username, email) VALUES ('${name}', '${email}');`);
+        const insertedUserId = result.insertId;
+
+        // Retrieve the created user's data and return it as a response.
+        const createdUser = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${insertedUserId};`);
+        res.status(201).json(createdUser[0]);
+    } catch (error: any) {
+        res.status(500).json(createErrorResponse(error));
+    }
+});
 
 export default router;
