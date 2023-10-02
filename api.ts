@@ -33,7 +33,7 @@ router.get('/who_needs_sql_injection', async (req: Request, res: Response) => {
 router.get('/users', async (req: Request, res: Response) => {
     try {
         const queryResult = await executeQuery('SELECT * FROM accounts;');
-        res.json(queryResult);
+        res.json(createSuccessResponse(queryResult));
     } catch (error) {
         res.status(500).json(createErrorResponse('Internal Server Error'));
     }
@@ -45,9 +45,9 @@ router.get('/users/:id', async (req: Request, res: Response) => {
     try {
         const queryResult = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
         if (queryResult.length === 0) {
-            res.status(404).json({ error: 'Account not found' });
+            return res.status(404).json(createErrorResponse( 'Account not found' ));
         } else {
-            res.json(queryResult[0]);
+            res.json(createSuccessResponse(queryResult[0]));
         }
     } catch (error) {
         res.status(500).json(createErrorResponse('Internal Server Error'));
@@ -58,8 +58,7 @@ router.post('/users', async (req: Request, res: Response) => {
     const { name, email } = req.body;
 
     if (!name || !email) {
-        res.status(400).json({ error: 'Name and email are required' });
-        return;
+        return res.status(400).json(createErrorResponse('Name and email are required' ));
     }
 
     try {
@@ -69,7 +68,7 @@ router.post('/users', async (req: Request, res: Response) => {
 
         // Retrieve the created user's data and return it as a response.
         const createdUser = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${insertedUserId};`);
-        res.status(201).json(createdUser[0]);
+        res.json(createSuccessResponse(createdUser[0]));
     } catch (error: any) {
         res.status(500).json(createErrorResponse(error));
     }
@@ -91,7 +90,7 @@ router.put('/users/:id', async (req: Request, res: Response) => {
 
         // Retrieve and return the updated user's data.
         const updatedUser = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
-        res.json(updatedUser[0]);
+        res.json(createSuccessResponse(updatedUser[0]));
     } catch (error: any) {
         return res.status(500).json(createErrorResponse(error));
     }
@@ -109,7 +108,7 @@ router.delete('/users/:id', async (req: Request, res: Response) => {
 
         // Delete the user from the database.
         await executeQuery(`DELETE FROM accounts WHERE account_id = ${userId};`);
-        res.json({ message: 'User deleted successfully' });
+        res.json(createSuccessResponse('User deleted successfully' ));
     } catch (error: any) {
         return res.status(500).json(createErrorResponse(error));
     }
