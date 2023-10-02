@@ -81,16 +81,16 @@ router.put('/users/:id', async (req: Request, res: Response) => {
 
     try {
         // Check if the user exists.
-        const userExists = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        const userExists = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
         if (userExists.length === 0) {
             return res.status(404).json(createErrorResponse( 'User not found' ));
         }
 
         // Update the user's information.
-        await executeQuery(`UPDATE users SET name = '${name}', email = '${email}' WHERE account_id = ${userId};`);
+        await executeQuery(`UPDATE accounts SET username = '${name}', email = '${email}' WHERE account_id = ${userId};`);
 
         // Retrieve and return the updated user's data.
-        const updatedUser = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        const updatedUser = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
         res.json(updatedUser[0]);
     } catch (error: any) {
         return res.status(500).json(createErrorResponse(error));
@@ -102,13 +102,13 @@ router.delete('/users/:id', async (req: Request, res: Response) => {
 
     try {
         // Check if the user exists.
-        const userExists = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        const userExists = await executeQuery(`SELECT * FROM accounts WHERE account_id = ${userId};`);
         if (userExists.length === 0) {
             return res.status(404).json(createErrorResponse( 'User not found' ));
         }
 
         // Delete the user from the database.
-        await executeQuery(`DELETE FROM users WHERE account_id = ${userId};`);
+        await executeQuery(`DELETE FROM accounts WHERE account_id = ${userId};`);
         res.json({ message: 'User deleted successfully' });
     } catch (error: any) {
         return res.status(500).json(createErrorResponse(error));
