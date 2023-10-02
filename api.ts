@@ -75,4 +75,26 @@ router.post('/users', async (req: Request, res: Response) => {
     }
 });
 
+router.put('/users/:id', async (req: Request, res: Response) => {
+    const userId: string = req.params.id;
+    const { name, email } = req.body;
+
+    try {
+        // Check if the user exists.
+        const userExists = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        if (userExists.length === 0) {
+            return res.status(404).json(createErrorResponse( 'User not found' ));
+        }
+
+        // Update the user's information.
+        await executeQuery(`UPDATE users SET name = '${name}', email = '${email}' WHERE account_id = ${userId};`);
+
+        // Retrieve and return the updated user's data.
+        const updatedUser = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        res.json(updatedUser[0]);
+    } catch (error: any) {
+        return res.status(500).json(createErrorResponse(error));
+    }
+});
+
 export default router;
