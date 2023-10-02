@@ -97,4 +97,22 @@ router.put('/users/:id', async (req: Request, res: Response) => {
     }
 });
 
+router.delete('/users/:id', async (req: Request, res: Response) => {
+    const userId: string = req.params.id;
+
+    try {
+        // Check if the user exists.
+        const userExists = await executeQuery(`SELECT * FROM users WHERE account_id = ${userId};`);
+        if (userExists.length === 0) {
+            return res.status(404).json(createErrorResponse( 'User not found' ));
+        }
+
+        // Delete the user from the database.
+        await executeQuery(`DELETE FROM users WHERE account_id = ${userId};`);
+        res.json({ message: 'User deleted successfully' });
+    } catch (error: any) {
+        return res.status(500).json(createErrorResponse(error));
+    }
+});
+
 export default router;
