@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { body, validationResult } from 'express-validator';
+import { param, body, validationResult } from 'express-validator';
 
 export const validateCreateAccount = [
   body('name').not().isEmpty().withMessage('Name is required'),
@@ -10,9 +10,6 @@ export const validateCreateAccount = [
     .notEmpty()
     .withMessage('Password is required'),
   
-  // Add any additional validation rules as needed for your specific case.
-  // For example, you might want to check for password complexity requirements.
-  
   (req: Request, res: Response, next: NextFunction) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -20,4 +17,20 @@ export const validateCreateAccount = [
     }
     next();
   }
+];
+
+export const validateUserIdParam = [
+  param('id')
+    .isInt({ min: 1 })
+    .withMessage('Invalid user ID'),
+
+  (req: Request, res: Response, next: NextFunction) => {
+    const errors = validationResult(req);
+
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    next();
+  },
 ];

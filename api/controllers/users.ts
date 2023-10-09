@@ -14,6 +14,7 @@ export const getUsers = async (req: Request, res: Response) => {
     }
 }
 export const getUser = async (req: Request, res: Response) => {
+
     const userId: string = req.params.id;
 
     try {
@@ -27,7 +28,6 @@ export const getUser = async (req: Request, res: Response) => {
         res.status(500).json(createErrorResponse('Internal Server Error'));
     }
 }
-
 export const createAccount = async (req: Request, res: Response) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -54,8 +54,7 @@ export const createAccount = async (req: Request, res: Response) => {
         console.error(error);
         res.status(500).json({ message: 'Internal Server Error' });
       }
-    };
-    
+};  
 export const putChangeAccount = async (req: Request, res: Response) => {
     const userId: string = req.params.id;
     const { name, email } = req.body;
@@ -78,7 +77,6 @@ export const putChangeAccount = async (req: Request, res: Response) => {
         return res.status(500).json(createErrorResponse(error));
     }
 }
-
 export const deleteAccount = async (req: Request, res: Response) => {
     const userId: string = req.params.id;
     try {
