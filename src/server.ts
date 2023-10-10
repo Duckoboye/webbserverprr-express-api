@@ -5,7 +5,7 @@ const app: Express = express();
 const port = process.env.SERVER_PORT || 3000;
 
 app.use(express.json());
-import apiRoutes from './api';
+import apiRoutes from './routes/api';
 app.use('/api', apiRoutes)
 
 app.listen(port, () => console.log('[server]: Server is running at http://localhost:'+port));

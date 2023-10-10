@@ -1,8 +1,8 @@
-import { createSuccessResponse, createErrorResponse } from "../../responses";
+import { createSuccessResponse, createErrorResponse } from "../responses";
 import { Request, Response } from 'express';
 import { validationResult } from 'express-validator';
 import bcrypt from 'bcrypt'
-import pool from '../../database'
+import pool from '../database'
 
 
 export const getUsers = async (req: Request, res: Response) => {
